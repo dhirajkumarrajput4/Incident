@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -72,6 +73,14 @@ public class AuthController {
         if (userService.findByEmail(userDto.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
         }
+
+        String password = userDto.getPassword();
+        String rejex ="^(0?=.*[a-z])(?=.*[A-Z])(?=.*).{8,}$";
+        boolean matches = Pattern.matches(rejex, password);
+        if (!matches){
+            throw new RuntimeException("Password should be minimum 8 characters, must have 1 Special, 1 Small, 1 Capital letter");
+        }
+
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setName(userDto.getName());
